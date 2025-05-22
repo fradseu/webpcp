@@ -1,0 +1,48 @@
+name: lts_pcp_web
+description: "O L&T Softwares é uma ferramenta de logística e produção."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fl_chart: ^1.0.0
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cupertino_icons: ^1.0.8
+  carousel_slider: ^5.0.0
+  fluttertoast: ^8.2.12
+  cloud_firestore: ^5.6.6
+  mask_text_input_formatter: ^2.9.0
+  flutter_riverpod: ^2.6.1
+  badges: ^3.1.2
+  async: ^2.12.0
+  flutter_svg: ^2.1.0
+  shared_preferences: ^2.2.2
+  rxdart: ^0.27.7 # Downgrade para versão compatível
+  intl: ^0.19.0  
+  pluto_grid: ^8.0.0
+  shimmer: ^3.0.0
+  google_fonts: ^6.2.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+# The following section is specific to Flutter packages.
+flutter:
+  assets:
+    - assets/images/
+    - assets/images/logo/
+    - assets/avatar/
+
+  uses-material-design: true
