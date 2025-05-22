@@ -1,0 +1,45 @@
+name: Deploy to Firebase Hosting on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: 'stable'
+      
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter build web --release
+      
+      # Configura o ambiente Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      # Instala o Firebase CLI
+      - name: Install Firebase Tools
+        run: npm install -g firebase-tools
+      
+      # Decodifica o service account e configura a autenticação
+      - name: Setup Firebase Auth
+        run: |
+          echo "${{ secrets.ACC_KEY_BASE64 }}" > service_account.json.base64
+          base64 -d service_account.json.base64 > service_account.json
+          echo "Decoded service account:"
+          cat service_account.json | jq -r '.client_email'
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$PWD/service_account.json" >> $GITHUB_ENV
+      
+      # Deploy no Firebase
+      - name: Deploy to Firebase
+        run: |
+          firebase deploy --only hosting --project webpcp --debug
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/service_account.json
