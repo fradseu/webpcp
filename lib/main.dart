@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:lts_pcp_web/pages/produtos.dart';
+
+import 'provider/theme_provider.dart'; // Remova o alias
+import 'theme/custom_theme.dart';
 
 import 'pages/home.dart';
 import 'pages/login.dart';
 import 'pages/redirecionamento.dart';
-//import 'pages/produtos.dart';
+import 'pages/produtos.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,17 +33,20 @@ Future<void> main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider); // Agora sem o alias
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'WEB-PCP',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: CustomTheme.lightTheme,
+      darkTheme: CustomTheme.darkTheme,
+      themeMode:
+          themeMode == AppThemeMode.light ? ThemeMode.light : ThemeMode.dark,
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),

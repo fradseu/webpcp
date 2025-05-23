@@ -94,14 +94,27 @@ class _LoginPageState extends State<LoginPage> {
                 // Campo Email
                 TextField(
                   controller: _emailController,
+                  style: const TextStyle(color: Colors.black, fontSize: 13),
                   decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
                     labelText: 'E-mail',
                     labelStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
                       color: Colors.black54,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(3),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 85, 57, 112),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      // Borda quando selecionado
+                      borderRadius: BorderRadius.circular(3),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 85, 57, 112), // Sua cor roxa
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -115,14 +128,27 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  style: const TextStyle(color: Colors.black, fontSize: 13),
                   decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
                     labelText: 'Senha',
                     labelStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
                       color: Colors.black54,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(3),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 85, 57, 112),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      // Borda quando selecionado
+                      borderRadius: BorderRadius.circular(3),
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 85, 57, 112), // Sua cor roxa
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -133,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                         _obscurePassword
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        color: Colors.grey,
+                        color: const Color.fromARGB(255, 85, 57, 112),
                       ),
                       onPressed: () {
                         setState(() {
@@ -152,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {},
                     child: const Text(
                       'Perdeu sua senha?',
-                      style: TextStyle(color: Color.fromARGB(255, 69, 43, 94)),
+                      style: TextStyle(color: Color.fromARGB(255, 85, 57, 112)),
                     ),
                   ),
                 ),
@@ -163,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {},
                     child: const Text(
                       'Não tem uma conta?',
-                      style: TextStyle(color: Color.fromARGB(255, 69, 43, 94)),
+                      style: TextStyle(color: Color.fromARGB(255, 85, 57, 112)),
                     ),
                   ),
                 ),
@@ -176,9 +202,9 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 69, 43, 94),
+                      backgroundColor: const Color.fromARGB(255, 85, 57, 112),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                     child:
