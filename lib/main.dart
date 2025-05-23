@@ -1,29 +1,27 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:responsive_builder/responsive_builder.dart';
+import 'package:lts_pcp_web/pages/produtos.dart';
 
-//import de páginas
+import 'pages/home.dart';
 import 'pages/login.dart';
-import 'pages/home.dart'; // Contém MobileHomePage, TabletHomePage, DesktopHomePage
+import 'pages/redirecionamento.dart';
+//import 'pages/produtos.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inicializa o Firebase
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyCQ4PZMuEtFPs7dwtALSLVjOVO_2yWffw",
-        authDomain: "lta-automacao.firebaseapp.com",
-        projectId: "lta-automacao",
-        storageBucket: "lta-automacao.appspot.com",
-        messagingSenderId: "848545802671",
-        appId: "1:848545802671:web:c7e42e4865cd59b9caa75a",
-        measurementId: "G-R6RKW7CM8W",
+        apiKey: "AIzaSyBv2l-pr0iPt7RzTRJOecTVffGBCRur9ns",
+        authDomain: "webpcp.firebaseapp.com",
+        projectId: "webpcp",
+        storageBucket: "webpcp.appspot.com",
+        messagingSenderId: "325114564489",
+        appId: "1:325114564489:web:2e502f98fee2008ea2db58",
       ),
     );
   } else {
@@ -33,28 +31,24 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = FirebaseAuth.instance.currentUser;
-
+  Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Web PCP',
+      title: 'WEB-PCP',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home:
-          user == null
-              ? const LoginPage()
-              : ScreenTypeLayout.builder(
-                mobile: (_) => const MobileHomePage(),
-                tablet: (_) => const TabletHomePage(),
-                desktop: (_) => const DesktopHomePage(),
-              ),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/redirect': (context) => const RedirectPage(),
+        '/home': (context) => const HomePage(),
+        '/produtos': (context) => const ProdutosPage(),
+      },
     );
   }
 }

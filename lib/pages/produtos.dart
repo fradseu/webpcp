@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lts_pcp_web/widgets/home_grid.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ProdutosPage extends StatelessWidget {
+  const ProdutosPage({super.key});
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
