@@ -63,7 +63,7 @@ class ModulosGrid extends ConsumerWidget {
                                       Text(
                                         nome.toString().toUpperCase(),
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.normal,
                                           fontSize: 12,
                                         ),
                                         textAlign: TextAlign.center,

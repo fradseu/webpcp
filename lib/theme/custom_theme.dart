@@ -47,7 +47,7 @@ class CustomTheme {
       surfaceTintColor: Colors.transparent,
     ),
     buttonTheme: ButtonThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       buttonColor: const Color(0xFF007AFF),
       textTheme: ButtonTextTheme.primary,
     ),
@@ -56,7 +56,7 @@ class CustomTheme {
         backgroundColor: const Color(0xFF007AFF),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         elevation: 0, // Sem sombra como no macOS
       ),
@@ -72,29 +72,29 @@ class CustomTheme {
         foregroundColor: const Color(0xFF007AFF),
         side: const BorderSide(color: Color(0xFF007AFF)),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
         elevation: 0,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFC6C6C8)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFC6C6C8)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFF007AFF), width: 1),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFFF3B30)),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFFF3B30), width: 1),
       ),
       filled: true,
@@ -169,14 +169,14 @@ class CustomTheme {
       backgroundColor: const Color(0xFF48484A),
       contentTextStyle: const TextStyle(color: Colors.white),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       elevation: 0,
     ),
     popupMenuTheme: PopupMenuThemeData(
       color: Colors.white.withOpacity(0.95),
       elevation: 3,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         side: BorderSide(color: Colors.grey.shade200, width: 0.5),
       ),
       textStyle: const TextStyle(color: Colors.black),
@@ -231,7 +231,7 @@ class CustomTheme {
     ),
     listTileTheme: ListTileThemeData(
       tileColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       iconColor: const Color(0xFF007AFF),
       textColor: Colors.black,
     ),
@@ -270,10 +270,15 @@ class CustomTheme {
       elevation: 1,
       margin: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: const Color(0xFF22272E), // GitHub Dark Dimmed surface
+      color: const Color.fromARGB(
+        255,
+        65,
+        74,
+        87,
+      ), // GitHub Dark Dimmed surface
     ),
     buttonTheme: ButtonThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       buttonColor: const Color(0xFF6CB6FF), // GitHub blue
       textTheme: ButtonTextTheme.primary,
     ),
@@ -282,7 +287,7 @@ class CustomTheme {
         backgroundColor: const Color(0xFF6CB6FF), // GitHub blue
         foregroundColor: const Color(0xFF22272E),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
     ),
@@ -297,28 +302,28 @@ class CustomTheme {
         foregroundColor: const Color(0xFF6CB6FF), // GitHub blue
         side: const BorderSide(color: Color(0xFF6CB6FF)),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFF444C56)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFF444C56)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFF6CB6FF), width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFF47067)),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         borderSide: const BorderSide(color: Color(0xFFF47067), width: 2),
       ),
       filled: true,
@@ -387,13 +392,13 @@ class CustomTheme {
       backgroundColor: const Color(0xFF444C56),
       contentTextStyle: const TextStyle(color: Color(0xFFADBAC7)),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
     ),
     popupMenuTheme: PopupMenuThemeData(
       color: const Color(0xFF22272E),
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(3),
         side: const BorderSide(color: Color(0xFF444C56)),
       ),
       textStyle: const TextStyle(color: Color(0xFFADBAC7)),

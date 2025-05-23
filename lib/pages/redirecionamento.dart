@@ -135,29 +135,6 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
                   : const Icon(Icons.error, color: Colors.red, size: 40),
               const SizedBox(height: 16),
               Text(_statusMessage),
-              if (userData != null) ...[
-                const SizedBox(height: 24),
-                Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        if (userData.perfil != null)
-                          ListTile(
-                            leading: const Icon(Icons.person_outline),
-                            title: const Text('Perfil'),
-                            subtitle: Text(
-                              userData.perfil!,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),

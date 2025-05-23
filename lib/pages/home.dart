@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../widgets/home_grid.dart';
 import '../provider/theme_provider.dart' as my_theme;
+import '../provider/user_modulos.dart';
+import '../provider/user_provider.dart';
+import '../widgets/home_grid.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Carrega os dados quando o widget é inicializado
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAllData();
+    });
+  }
+
+  // Método para carregar todos os dados necessários
+  Future<void> _loadAllData() async {
+    await ref.read(userProvider.notifier).fetchUserData();
+    // O modulosProvider vai se atualizar automaticamente quando o userProvider mudar
+  }
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -15,10 +37,16 @@ class HomePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = FirebaseAuth.instance.currentUser;
+  Widget build(BuildContext context) {
+    final userData = ref.watch(userProvider);
+    final modulosAsync = ref.watch(modulosProvider);
     final theme = Theme.of(context);
     final themeMode = ref.watch(my_theme.themeProvider);
+
+    // Mostra um indicador de carregamento enquanto os dados estão sendo buscados
+    if (userData == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -44,38 +72,21 @@ class HomePage extends ConsumerWidget {
         ],
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: ModulosGrid(), // Agora com comportamento de Wrap
-          ),
-          Text(
-            'Bem-vindo!',
-            style: TextStyle(
-              fontSize: 24,
-              color: theme.textTheme.titleLarge?.color,
+          // Grid alinhado no topo e centralizado horizontalmente
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 20.0,
+              ), // Espaço do topo (opcional)
+              child: ModulosGrid(),
             ),
           ),
-          const SizedBox(height: 16),
-          if (user != null)
-            Text(
-              'Logado como:\n${user.email}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: theme.textTheme.bodyLarge?.color,
-              ),
-            ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () => _logout(context),
-            icon: const Icon(Icons.logout),
-            label: const Text('Sair'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-            ),
-          ),
+          // Espaço flexível para empurrar o botão para baixo
+          const Spacer(),
+
+          // Botão de sair
         ],
       ),
     );
