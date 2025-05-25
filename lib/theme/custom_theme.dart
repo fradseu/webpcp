@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class CustomTheme {
   // Tema Light (macOS Catalina style)
   static final ThemeData lightTheme = ThemeData(
+    splashColor: Color.fromARGB(255, 85, 57, 112),
     brightness: Brightness.light,
     primarySwatch: Colors.blue,
     primaryColor: const Color(0xFF007AFF), // Azul do macOS
@@ -239,6 +240,7 @@ class CustomTheme {
 
   // Tema Dark (baseado no GitHub Dark Dimmed)
   static final ThemeData darkTheme = ThemeData(
+    splashColor: Color.fromARGB(255, 183, 136, 226),
     brightness: Brightness.dark,
     primarySwatch: Colors.deepPurple,
     scaffoldBackgroundColor: const Color(0xFF1C2128), // GitHub Dark Dimmed bg
@@ -273,7 +275,7 @@ class CustomTheme {
       color: const Color.fromARGB(
         255,
         65,
-        74,
+        69,
         87,
       ), // GitHub Dark Dimmed surface
     ),

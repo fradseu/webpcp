@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../provider/user_modulos.dart';
 
 class ModulosGrid extends ConsumerWidget {
@@ -11,7 +11,13 @@ class ModulosGrid extends ConsumerWidget {
     final modulosAsync = ref.watch(modulosProvider);
 
     return modulosAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading:
+          () => Center(
+            child: LoadingAnimationWidget.inkDrop(
+              color: Color.fromARGB(255, 85, 57, 112),
+              size: 36,
+            ),
+          ),
       error: (err, stack) => Center(child: Text('Erro: $err')),
       data: (modulos) {
         return SingleChildScrollView(
@@ -30,50 +36,10 @@ class ModulosGrid extends ConsumerWidget {
 
                       return SizedBox(
                         width: 150,
-                        child: MouseRegion(
-                          cursor:
-                              SystemMouseCursors
-                                  .click, // Muda o cursor para mão
-                          child: Tooltip(
-                            message: nome, // Texto do tooltip
-                            preferBelow: false, // Exibe acima do item
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, route);
-                              },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 3,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        _getMaterialIconByName(iconName),
-                                        size: 32,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        nome.toString().toUpperCase(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                        child: _HoverCard(
+                          nome: nome,
+                          iconName: iconName,
+                          route: route,
                         ),
                       );
                     }).toList(),
@@ -82,6 +48,77 @@ class ModulosGrid extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _HoverCard extends StatefulWidget {
+  final String nome;
+  final String iconName;
+  final String route;
+
+  const _HoverCard({
+    required this.nome,
+    required this.iconName,
+    required this.route,
+  });
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      cursor: SystemMouseCursors.click,
+      child: Tooltip(
+        message: widget.nome,
+        preferBelow: false,
+        child: GestureDetector(
+          onTap: () => Navigator.pushNamed(context, widget.route),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            transform:
+                _hovering
+                    ? Matrix4.translationValues(0, -5, 0)
+                    : Matrix4.identity(),
+            curve: Curves.easeOut,
+            child: Card(
+              elevation: _hovering ? 8 : 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _getMaterialIconByName(widget.iconName),
+                      size: 32,
+                      color: Theme.of(context).splashColor,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.nome.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

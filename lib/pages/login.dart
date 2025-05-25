@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -209,7 +210,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child:
                         _isLoading
-                            ? const CircularProgressIndicator(
+                            ? LoadingAnimationWidget.inkDrop(
+                              size: 28,
                               color: Colors.white,
                             )
                             : const Text(

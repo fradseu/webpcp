@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../provider/user_modulos.dart';
 import '../provider/user_products.dart';
@@ -24,15 +25,13 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
 
   Future<void> _initialize() async {
     try {
-      // Mensagem inicial
       setState(() {
         _statusMessage = 'Carregando dados do usuário...';
         _isLoading = true;
       });
 
-      // Busca os dados do usuário
       await ref.read(userProvider.notifier).fetchUserData();
-      await Future.delayed(const Duration(seconds: 4)); // aguarda 4s
+      await Future.delayed(const Duration(seconds: 4));
 
       final userData = ref.read(userProvider);
       debugPrint('Dados do usuário: $userData');
@@ -47,7 +46,6 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
         return;
       }
 
-      // Atualiza mensagem para carregamento dos produtos
       setState(() {
         _statusMessage = 'Carregando produtos do usuário...';
       });
@@ -57,17 +55,16 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
             .read(produtosProvider.notifier)
             .buscarProdutos(userData.email!);
       }
-      await Future.delayed(const Duration(seconds: 4)); // aguarda 4s
+      await Future.delayed(const Duration(seconds: 4));
 
-      // Carrega os módulos
-      // Atualiza mensagem para carregamento dos produtos
       setState(() {
         _statusMessage = 'Carregando módulos do usuário...';
       });
+
       final modulos = await ref.read(modulosProvider.future);
       debugPrint('Módulos carregados: $modulos');
 
-      await Future.delayed(const Duration(seconds: 3)); // aguarda 4s
+      await Future.delayed(const Duration(seconds: 3));
 
       setState(() {
         _statusMessage =
@@ -115,15 +112,13 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
               ),
               const SizedBox(height: 16),
               _isLoading
-                  ? const Column(
+                  ? Column(
                     children: [
-                      CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color.fromARGB(255, 69, 43, 94),
-                        ),
-                        strokeWidth: 3,
+                      LoadingAnimationWidget.inkDrop(
+                        color: const Color.fromARGB(255, 85, 57, 112),
+                        size: 36,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                     ],
                   )
                   : userData != null
