@@ -176,8 +176,6 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
               },
             ),
             const SizedBox(height: 8),
-            Align(alignment: Alignment.topCenter, child: ModulosGrid()),
-            const SizedBox(height: 24), // Espaço no fim do scroll
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Align(
