@@ -42,7 +42,7 @@ class CustomTheme {
       elevation: 0,
       margin: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Bordas mais arredondadas
+        borderRadius: BorderRadius.circular(3), // Bordas mais arredondadas
       ),
       color: Colors.white.withOpacity(0.7), // Efeito translúcido
       surfaceTintColor: Colors.transparent,

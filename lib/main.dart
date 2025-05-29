@@ -3,13 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-import 'provider/theme_provider.dart'; // Remova o alias
+import 'provider/theme_provider.dart';
 import 'theme/custom_theme.dart';
 
+import 'pages/apontamento.dart';
+import 'pages/pedidos.dart';
 import 'pages/home.dart';
 import 'pages/login.dart';
 import 'pages/redirecionamento.dart';
 import 'pages/produtos.dart';
+import 'pages/pcp.dart';
+import 'pages/producao.dart';
+import 'pages/usuarios.dart';
+import 'pages/mrp.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +59,12 @@ class MyApp extends ConsumerWidget {
         '/redirect': (context) => const RedirectPage(),
         '/home': (context) => const HomePage(),
         '/produtos': (context) => const ProdutosPage(),
+        '/pcp': (context) => const PcpPage(),
+        '/producao': (context) => const ProducaoPage(),
+        '/usuarios': (context) => const UsuariosPage(),
+        '/mrp': (context) => const MrpPage(),
+        '/apontamento': (context) => const ApontamentoPage(),
+        '/pedidos': (context) => const PedidosPage(),
       },
     );
   }

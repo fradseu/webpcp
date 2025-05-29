@@ -90,9 +90,6 @@ class _HoverCardState extends State<_HoverCard> {
             curve: Curves.easeOut,
             child: Card(
               elevation: _hovering ? 8 : 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
