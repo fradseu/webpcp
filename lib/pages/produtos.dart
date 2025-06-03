@@ -45,6 +45,106 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
     }
   }
 
+  final GlobalKey _menuKey = GlobalKey();
+  OverlayEntry? _overlayEntry;
+
+  void _toggleMenu() {
+    if (_overlayEntry == null) {
+      final renderBox =
+          _menuKey.currentContext!.findRenderObject() as RenderBox;
+      final offset = renderBox.localToGlobal(Offset.zero);
+
+      _overlayEntry = OverlayEntry(
+        builder:
+            (context) => Stack(
+              children: [
+                GestureDetector(
+                  onTap: _toggleMenu,
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.transparent,
+                  ),
+                ),
+                Positioned(
+                  top: offset.dy + renderBox.size.height,
+                  left: offset.dx - 100,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(6),
+                    color: Theme.of(context).cardColor,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 200),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              // Ação de importar (por enquanto faz nada)
+                              _toggleMenu();
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.upload_file, size: 18),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "Importar",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          InkWell(
+                            onTap: () {
+                              final produtos = ref.read(produtosProvider);
+                              _gridKey.currentState?.exportToExcel(produtos);
+                              _toggleMenu();
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.download, size: 18),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "Exportar",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      );
+
+      Overlay.of(context).insert(_overlayEntry!);
+    } else {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userData = ref.watch(userProvider);
@@ -85,7 +185,10 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color: Colors.amber,
+                    color:
+                        Colors
+                            .amber, //cores definidas fora do theme para criação da página em ambiente
+                    // de desenvolvimento, facilita observar o objeto
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -93,19 +196,6 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                         BtnNovoProduto(),
                         SizedBox(width: 8),
 
-                        ElevatedButton(
-                          onPressed: () {
-                            final produtos = ref.read(produtosProvider);
-                            _gridKey.currentState?.exportToExcel(produtos);
-                          },
-                          child: const Row(
-                            children: [
-                              Icon(Icons.download),
-                              SizedBox(width: 4),
-                              Text("Exportar Excel"),
-                            ],
-                          ),
-                        ),
                         const Text(
                           nomePagina,
                           style: TextStyle(
@@ -114,7 +204,17 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        const Icon(Icons.settings, color: Colors.white),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            key: _menuKey,
+                            onTap: _toggleMenu,
+                            child: const Icon(
+                              Icons.settings,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -122,12 +222,18 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color: Colors.blue,
+                    color:
+                        Colors
+                            .blue, //cores definidas fora do theme para criação da página em ambiente
+                    // de desenvolvimento, facilita observar o objeto
                   ),
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color: Colors.amber,
+                    color:
+                        Colors
+                            .amber, //cores definidas fora do theme para criação da página em ambiente
+                    // de desenvolvimento, facilita observar o objeto
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -247,23 +353,25 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
   }
 
   Future<void> exportToExcel(List<Map<String, dynamic>> produtos) async {
+    if (stateManager == null) return;
+
+    final visibleRows = stateManager!.rows;
+
+    if (visibleRows.isEmpty) return;
+
     final excel = Excel.createExcel();
     final sheet = excel['Produtos'];
 
-    if (produtos.isEmpty) return;
-
-    // Adiciona cabeçalhos
-    final headers = produtos.first.keys.toList();
+    final headers = columns.map((c) => c.field).toList();
     sheet.appendRow(headers);
 
-    // Adiciona dados
-    for (var produto in produtos) {
-      final row = headers.map((k) => produto[k]?.toString() ?? '').toList();
-      sheet.appendRow(row);
+    for (final row in visibleRows) {
+      final rowData =
+          headers.map((h) => row.cells[h]?.value?.toString() ?? '').toList();
+      sheet.appendRow(rowData);
     }
 
     try {
-      // Para Flutter Web, usamos a API de download no navegador
       if (kIsWeb) {
         final bytes = excel.encode();
         if (bytes != null) {
@@ -275,25 +383,22 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
           final anchor =
               html.document.createElement('a') as html.AnchorElement
                 ..href = url
-                ..download = 'produtos_exportados.xlsx'
+                ..download = 'produtos_filtrados.xlsx'
                 ..style.display = 'none';
 
           html.document.body?.children.add(anchor);
           anchor.click();
-
-          // Limpeza
           html.document.body?.children.remove(anchor);
           html.Url.revokeObjectUrl(url);
 
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Arquivo exportado com sucesso!')),
+            const SnackBar(content: Text('Exportação concluída!')),
           );
         }
       } else {
-        // Código para outras plataformas (mobile/desktop)
         final dir = await getApplicationDocumentsDirectory();
-        final filePath = '${dir.path}/produtos_exportados.xlsx';
+        final filePath = '${dir.path}/produtos_filtrados.xlsx';
         final fileBytes = excel.encode();
 
         if (fileBytes != null) {
@@ -301,7 +406,7 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
           await file.writeAsBytes(fileBytes);
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Arquivo exportado: $filePath')),
+            SnackBar(content: Text('Arquivo salvo em: $filePath')),
           );
         }
       }
