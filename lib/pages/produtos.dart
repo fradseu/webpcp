@@ -172,7 +172,7 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
         actions: const [CustomDropdownMenu(), SizedBox(width: 10)],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8),
+        //padding: const EdgeInsets.all(2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -181,21 +181,21 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                 final bool isWide = constraints.maxWidth >= 800;
                 final double containerWidth =
                     isWide ? constraints.maxWidth / 3 : constraints.maxWidth;
+                final containerColor =
+                    Theme.of(
+                      context,
+                    ).colorScheme.onTertiary; // Cor definida uma única vez
                 final containers = [
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color:
-                        Colors
-                            .amber, //cores definidas fora do theme para criação da página em ambiente
-                    // de desenvolvimento, facilita observar o objeto
+                    color: containerColor, // Usando a variável aqui
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         BtnNovoProduto(),
                         SizedBox(width: 8),
-
                         const Text(
                           nomePagina,
                           style: TextStyle(
@@ -209,31 +209,24 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                           child: GestureDetector(
                             key: _menuKey,
                             onTap: _toggleMenu,
-                            child: const Icon(
+                            child: Icon(
                               Icons.settings,
-                              color: Colors.white,
+                              color: Theme.of(context).splashColor,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color:
-                        Colors
-                            .blue, //cores definidas fora do theme para criação da página em ambiente
-                    // de desenvolvimento, facilita observar o objeto
+                    color: containerColor, // Usando a variável aqui
                   ),
                   Container(
                     width: containerWidth,
                     height: 50,
-                    color:
-                        Colors
-                            .amber, //cores definidas fora do theme para criação da página em ambiente
-                    // de desenvolvimento, facilita observar o objeto
+                    color: containerColor, // Usando a variável aqui
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -248,23 +241,16 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(
-                              0,
-                              42,
-                            ), // largura mínima 0, altura 32px
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ), // opcional
+                            backgroundColor: Theme.of(context).splashColor,
+                            minimumSize: const Size(0, 42),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
                               Icon(Icons.update, size: 18),
                               SizedBox(width: 8),
-                              Text(
-                                'Atualizar',
-                                style: TextStyle(fontSize: 12),
-                              ), // fonte menor se quiser
+                              Text('Atualizar', style: TextStyle(fontSize: 12)),
                             ],
                           ),
                         ),

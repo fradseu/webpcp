@@ -129,7 +129,7 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
                   )
                   : const Icon(Icons.error, color: Colors.red, size: 40),
               const SizedBox(height: 16),
-              Text(_statusMessage),
+              Text(_statusMessage, style: const TextStyle(color: Colors.black)),
             ],
           ),
         ),

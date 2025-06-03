@@ -37,6 +37,7 @@ class CustomTheme {
       onSurface: Colors.black,
       onBackground: Colors.black,
       onError: Colors.white,
+      onTertiary: Color(0xFFADBAC7),
     ),
     cardTheme: CardTheme(
       elevation: 0,
@@ -267,6 +268,7 @@ class CustomTheme {
       onSurface: Color(0xFFADBAC7), // GitHub text secondary
       onBackground: Color(0xFFADBAC7),
       onError: Color(0xFF22272E),
+      onTertiary: Color(0xFF444C56),
     ),
     cardTheme: CardTheme(
       elevation: 1,

@@ -6,6 +6,9 @@ class BtnNovoProduto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Theme.of(context).splashColor,
+      ),
       onPressed: () {},
       icon: const Icon(Icons.add, size: 16), // Ícone à esquerda
       label: const Text(
