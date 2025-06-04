@@ -5,6 +5,7 @@ import 'package:pluto_grid/pluto_grid.dart';
 import '../provider/theme_provider.dart' as my_theme;
 import '../provider/user_products.dart';
 import '../provider/user_provider.dart';
+import '../utils/importdata.dart';
 import '../widgets/btn_novo_produto.dart';
 import '../widgets/custom_appbar.dart';
 
@@ -79,8 +80,8 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           InkWell(
-                            onTap: () {
-                              // Ação de importar (por enquanto faz nada)
+                            onTap: () async {
+                              await ImportData.importExcelData(context);
                               _toggleMenu();
                             },
                             child: const Padding(

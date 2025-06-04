@@ -34,7 +34,7 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
       await Future.delayed(const Duration(seconds: 4));
 
       final userData = ref.read(userProvider);
-      debugPrint('Dados do usuário: $userData');
+      //debugPrint('Dados do usuário: $userData');
 
       if (userData == null) {
         setState(() {
@@ -62,7 +62,7 @@ class _RedirectPageState extends ConsumerState<RedirectPage> {
       });
 
       final modulos = await ref.read(modulosProvider.future);
-      debugPrint('Módulos carregados: $modulos');
+      //debugPrint('Módulos carregados: $modulos');
 
       await Future.delayed(const Duration(seconds: 3));
 
