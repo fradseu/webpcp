@@ -6,7 +6,6 @@ import '../provider/theme_provider.dart' as my_theme;
 import '../provider/user_products.dart';
 import '../provider/user_provider.dart';
 import '../widgets/btn_novo_produto.dart';
-import '../widgets/home_grid.dart';
 import '../widgets/custom_appbar.dart';
 
 import 'dart:io';
@@ -342,11 +341,11 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
     if (stateManager == null) return;
 
     final visibleRows = stateManager!.rows;
-
     if (visibleRows.isEmpty) return;
 
+    // Cria o Excel com apenas a aba "Produtos" (evitando Sheet1)
     final excel = Excel.createExcel();
-    final sheet = excel['Produtos'];
+    final sheet = excel['Produtos']; // Isso já cria a aba se não existir
 
     final headers = columns.map((c) => c.field).toList();
     sheet.appendRow(headers);
@@ -424,9 +423,9 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
             rows: rows,
             onLoaded: (event) => stateManager = event.stateManager,
             onChanged: (event) {
-              debugPrint('Valor alterado: ${event.value}');
-              debugPrint('Coluna: ${event.column.field}');
-              debugPrint('Linha completa: ${event.row.cells}');
+              //debugPrint('Valor alterado: ${event.value}');
+              //debugPrint('Coluna: ${event.column.field}');
+              //debugPrint('Linha completa: ${event.row.cells}');
             },
             configuration: PlutoGridConfiguration(
               localeText: PlutoGridLocaleText.brazilianPortuguese(),

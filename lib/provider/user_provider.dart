@@ -52,12 +52,12 @@ class UserNotifier extends StateNotifier<UserData?> {
     try {
       final user = _auth.currentUser;
       if (user == null) {
-        debugPrint('⚠️ Nenhum usuário autenticado');
+        //debugPrint('⚠️ Nenhum usuário autenticado');
         state = null;
         return;
       }
 
-      debugPrint('🔍 Buscando dados do usuário: ${user.email}');
+      //debugPrint('🔍 Buscando dados do usuário: ${user.email}');
 
       final query =
           await _firestore
@@ -67,9 +67,9 @@ class UserNotifier extends StateNotifier<UserData?> {
               .get();
 
       if (query.docs.isEmpty) {
-        debugPrint(
-          '⚠️ Nenhum documento encontrado para o email: ${user.email}',
-        );
+        //debugPrint(
+        //  '⚠️ Nenhum documento encontrado para o email: ${user.email}',
+        //);
         state = UserData(uid: user.uid, email: user.email);
         return;
       }
@@ -77,15 +77,15 @@ class UserNotifier extends StateNotifier<UserData?> {
       final userDoc = query.docs.first;
       state = UserData.fromFirestore(userDoc);
 
-      debugPrint('✅ Dados do usuário carregados: ${state.toString()}');
+      //debugPrint('✅ Dados do usuário carregados: ${state.toString()}');
     } on FirebaseException catch (e, stack) {
-      debugPrint('🔥 Erro no Firebase: ${e.message}');
-      debugPrint('Stack trace: $stack');
+      //debugPrint('🔥 Erro no Firebase: ${e.message}');
+      //debugPrint('Stack trace: $stack');
       state = null;
       rethrow;
     } catch (e, stack) {
-      debugPrint('💥 Erro inesperado: $e');
-      debugPrint('Stack trace: $stack');
+      //debugPrint('💥 Erro inesperado: $e');
+      //debugPrint('Stack trace: $stack');
       state = null;
       rethrow;
     }
@@ -102,7 +102,7 @@ class UserNotifier extends StateNotifier<UserData?> {
 
       await fetchUserData(); // Atualiza o estado com os novos dados
     } catch (e) {
-      debugPrint('Erro ao atualizar usuário: $e');
+      //debugPrint('Erro ao atualizar usuário: $e');
       rethrow;
     }
   }
@@ -111,9 +111,9 @@ class UserNotifier extends StateNotifier<UserData?> {
     try {
       await _auth.signOut();
       state = null;
-      debugPrint('🚪 Usuário deslogado com sucesso');
+      //debugPrint('🚪 Usuário deslogado com sucesso');
     } catch (e) {
-      debugPrint('Erro ao deslogar: $e');
+      //debugPrint('Erro ao deslogar: $e');
       rethrow;
     }
   }

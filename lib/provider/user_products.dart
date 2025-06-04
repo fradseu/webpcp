@@ -13,7 +13,7 @@ class ProdutosNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     state = produtos;
 
     // Print para confirmar o estado
-    debugPrint('Produtos carregados no provider: $state');
+    //debugPrint('Produtos carregados no provider: $state');
   }
 }
 
