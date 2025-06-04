@@ -105,6 +105,26 @@ class ImportData {
         final cod = values[0];
         final quantidade = int.tryParse(values[1]) ?? 0;
         final nome = values[2];
+        final referencia = values.length > 3 ? values[3] : '';
+        final descricao = values.length > 4 ? values[4] : '';
+        final unidade = values.length > 5 ? values[5] : '';
+        final altura = values.length > 6 ? values[6] : '';
+        final largura = values.length > 7 ? values[7] : '';
+        final comprimento = values.length > 8 ? values[8] : '';
+        final peso = values.length > 9 ? values[9] : '';
+        final volume = values.length > 10 ? values[10] : '';
+        final tempoProducao = values.length > 11 ? values[11] : '';
+        final multiProducao = values.length > 12 ? values[12] : '';
+        final tipoProcessamento = values.length > 13 ? values[13] : '';
+        final recursoPrincipal = values.length > 14 ? values[14] : '';
+        final setup = values.length > 15 ? values[15] : '';
+        final grupo = values.length > 16 ? values[16] : '';
+        final familia = values.length > 17 ? values[17] : '';
+        final ativo = values.length > 18 ? values[18] : '';
+        final leadTime = values.length > 19 ? values[19] : '';
+        final estoqueMin = values.length > 20 ? values[20] : '';
+        final estoqueMax = values.length > 21 ? values[21] : '';
+        final observacoes = values.length > 22 ? values[22] : '';
 
         final existing =
             await produtosRef.where('cod', isEqualTo: cod).limit(1).get();
@@ -113,17 +133,57 @@ class ImportData {
           await existing.docs.first.reference.update({
             'quantidade': quantidade,
             'nome': nome,
+            'referência': referencia,
+            'descrição': descricao,
+            'unidade': unidade,
+            'altura': altura,
+            'largura': largura,
+            'comprimento': comprimento,
+            'peso': peso,
+            'volume': volume,
+            'tempo de produção': tempoProducao,
+            'multi. produção': multiProducao,
+            'tipo processamento': tipoProcessamento,
+            'recurso principal': recursoPrincipal,
+            'setup': setup,
+            'grupo': grupo,
+            'familia': familia,
+            'ativo': ativo,
+            'lead time': leadTime,
+            'estoque min': estoqueMin,
+            'estoque máximo': estoqueMax,
+            'observações': observacoes,
           });
         } else {
           await produtosRef.add({
             'cod': cod,
             'quantidade': quantidade,
             'nome': nome,
+            'referência': referencia,
+            'descrição': descricao,
+            'unidade': unidade,
+            'altura': altura,
+            'largura': largura,
+            'comprimento': comprimento,
+            'peso': peso,
+            'volume': volume,
+            'tempo de produção': tempoProducao,
+            'multi. produção': multiProducao,
+            'tipo processamento': tipoProcessamento,
+            'recurso principal': recursoPrincipal,
+            'setup': setup,
+            'grupo': grupo,
+            'familia': familia,
+            'ativo': ativo,
+            'lead time': leadTime,
+            'estoque min': estoqueMin,
+            'estoque máximo': estoqueMax,
+            'observações': observacoes,
           });
         }
 
         progress++;
-        dialogSetState(() {}); // Atualiza o overlay de progresso
+        dialogSetState(() {});
       }
 
       isComplete = true;
