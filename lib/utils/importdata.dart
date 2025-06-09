@@ -14,7 +14,7 @@ class ImportData {
       final userEmail = user.email ?? '';
       if (userEmail.isEmpty) throw Exception('E-mail não encontrado.');
 
-      // Primeiro seleciona o arquivo
+      // Seleciona o arquivo Excel
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['xlsx'],
@@ -35,22 +35,20 @@ class ImportData {
       var rows = excel.tables['Produtos']!.rows;
       if (rows.isEmpty) throw Exception('A planilha está vazia.');
 
-      // Agora que temos o número de linhas, mostramos o overlay
+      // Configuração do overlay de progresso
       int progress = 0;
       int total = rows.length - 1; // Descontando o cabeçalho
       bool isComplete = false;
-
-      // Controlador de atualização do overlay
       late StateSetter dialogSetState;
 
-      // Mostrar overlay após determinar o total
+      // Mostrar overlay de progresso
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext ctx) {
           return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              dialogSetState = setState; // salvar o setter para uso externo
+              dialogSetState = setState;
               return AlertDialog(
                 title: Text(isComplete ? 'Upload completo' : 'Importando...'),
                 content: Column(
@@ -77,9 +75,14 @@ class ImportData {
         },
       );
 
-      final header = rows.first.map((e) => e?.value.toString() ?? '').toList();
-      rows = rows.sublist(1);
+      // Processa cabeçalhos (convertendo para lowercase para padronização)
+      final header =
+          rows.first
+              .map((e) => e?.value.toString().toLowerCase().trim() ?? '')
+              .toList();
+      rows = rows.sublist(1); // Remove linha de cabeçalho
 
+      // Obtém referência do Firestore
       final query =
           await FirebaseFirestore.instance
               .collection('user_produtcs')
@@ -96,90 +99,61 @@ class ImportData {
           .doc(docId)
           .collection('produtos');
 
+      // Processa cada linha
       for (var i = 0; i < rows.length; i++) {
-        final values =
-            rows[i].map((cell) => cell?.value.toString() ?? '').toList();
+        final row = rows[i];
+        final data = <String, dynamic>{};
 
-        if (values.length < 3) continue;
+        // Mapeia cada célula baseado no cabeçalho
+        for (var j = 0; j < row.length; j++) {
+          if (j >= header.length) break;
+          final columnName = header[j];
+          if (columnName.isEmpty) continue;
 
-        final cod = values[0];
-        final quantidade = int.tryParse(values[1]) ?? 0;
-        final nome = values[2];
-        final referencia = values.length > 3 ? values[3] : '';
-        final descricao = values.length > 4 ? values[4] : '';
-        final unidade = values.length > 5 ? values[5] : '';
-        final altura = values.length > 6 ? values[6] : '';
-        final largura = values.length > 7 ? values[7] : '';
-        final comprimento = values.length > 8 ? values[8] : '';
-        final peso = values.length > 9 ? values[9] : '';
-        final volume = values.length > 10 ? values[10] : '';
-        final tempoProducao = values.length > 11 ? values[11] : '';
-        final multiProducao = values.length > 12 ? values[12] : '';
-        final tipoProcessamento = values.length > 13 ? values[13] : '';
-        final recursoPrincipal = values.length > 14 ? values[14] : '';
-        final setup = values.length > 15 ? values[15] : '';
-        final grupo = values.length > 16 ? values[16] : '';
-        final familia = values.length > 17 ? values[17] : '';
-        final ativo = values.length > 18 ? values[18] : '';
-        final leadTime = values.length > 19 ? values[19] : '';
-        final estoqueMin = values.length > 20 ? values[20] : '';
-        final estoqueMax = values.length > 21 ? values[21] : '';
-        final observacoes = values.length > 22 ? values[22] : '';
+          final cellValue = row[j]?.value;
 
+          // Conversão de tipos específicos
+          if (columnName == 'quantidade' ||
+              columnName == 'estoque min' ||
+              columnName == 'estoque máximo') {
+            data[columnName] =
+                cellValue is num
+                    ? cellValue.toInt()
+                    : int.tryParse(cellValue?.toString() ?? '') ?? 0;
+          } else if (columnName == 'peso' ||
+              columnName == 'volume' ||
+              columnName == 'altura' ||
+              columnName == 'largura' ||
+              columnName == 'comprimento') {
+            data[columnName] =
+                cellValue is num
+                    ? cellValue.toDouble()
+                    : double.tryParse(cellValue?.toString() ?? '') ?? 0.0;
+          } else if (columnName == 'ativo') {
+            data[columnName] =
+                (cellValue?.toString().toLowerCase() == 'sim' ||
+                    cellValue?.toString().toLowerCase() == 'yes' ||
+                    cellValue?.toString().toLowerCase() == 'true');
+          } else {
+            data[columnName] = cellValue?.toString() ?? '';
+          }
+        }
+
+        // Campos obrigatórios
+        if (!data.containsKey('cod') || data['cod']?.toString().isEmpty == true)
+          continue;
+
+        // Verifica se documento já existe
         final existing =
-            await produtosRef.where('cod', isEqualTo: cod).limit(1).get();
+            await produtosRef
+                .where('cod', isEqualTo: data['cod']?.toString())
+                .limit(1)
+                .get();
 
         if (existing.docs.isNotEmpty) {
-          await existing.docs.first.reference.update({
-            'quantidade': quantidade,
-            'nome': nome,
-            'referência': referencia,
-            'descrição': descricao,
-            'unidade': unidade,
-            'altura': altura,
-            'largura': largura,
-            'comprimento': comprimento,
-            'peso': peso,
-            'volume': volume,
-            'tempo de produção': tempoProducao,
-            'multi. produção': multiProducao,
-            'tipo processamento': tipoProcessamento,
-            'recurso principal': recursoPrincipal,
-            'setup': setup,
-            'grupo': grupo,
-            'familia': familia,
-            'ativo': ativo,
-            'lead time': leadTime,
-            'estoque min': estoqueMin,
-            'estoque máximo': estoqueMax,
-            'observações': observacoes,
-          });
+          await existing.docs.first.reference.update(data);
         } else {
-          await produtosRef.add({
-            'cod': cod,
-            'quantidade': quantidade,
-            'nome': nome,
-            'referência': referencia,
-            'descrição': descricao,
-            'unidade': unidade,
-            'altura': altura,
-            'largura': largura,
-            'comprimento': comprimento,
-            'peso': peso,
-            'volume': volume,
-            'tempo de produção': tempoProducao,
-            'multi. produção': multiProducao,
-            'tipo processamento': tipoProcessamento,
-            'recurso principal': recursoPrincipal,
-            'setup': setup,
-            'grupo': grupo,
-            'familia': familia,
-            'ativo': ativo,
-            'lead time': leadTime,
-            'estoque min': estoqueMin,
-            'estoque máximo': estoqueMax,
-            'observações': observacoes,
-          });
+          await produtosRef.add(data);
         }
 
         progress++;
@@ -187,13 +161,25 @@ class ImportData {
       }
 
       isComplete = true;
-      dialogSetState(() {}); // Força troca do botão "Cancelar" para "Fechar"
+      dialogSetState(() {});
+
+      // Fecha automaticamente após 2 segundos se concluído
+      if (isComplete) {
+        await Future.delayed(Duration(seconds: 2));
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Importação concluída com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
       print('Erro ao importar Excel: $e');
       Navigator.of(context).pop(); // Fecha o overlay se estiver aberto
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro ao importar: $e'),
+          content: Text('Erro ao importar: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );

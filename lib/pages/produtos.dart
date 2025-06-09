@@ -238,6 +238,7 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                               await ref
                                   .read(produtosProvider.notifier)
                                   .buscarProdutos(userData.email!);
+                              _gridKey.currentState?.atualizarGrid();
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -305,9 +306,29 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
   List<PlutoColumn> _buildDynamicColumns(List<Map<String, dynamic>> produtos) {
     if (produtos.isEmpty) return [];
 
+    // Obtém todos os campos únicos
     final Set<String> fields = produtos.expand((p) => p.keys).toSet();
 
-    return fields.map((field) {
+    // Converte para lista e ordena alfabeticamente
+    List<String> sortedFields = fields.toList()..sort((a, b) => a.compareTo(b));
+
+    // Define a ordem prioritária para as colunas especiais
+    const List<String> priorityColumns = ['cod', 'nome'];
+
+    // Filtra as colunas prioritárias que existem nos dados
+    final List<String> existingPriorityColumns =
+        priorityColumns.where((col) => sortedFields.contains(col)).toList();
+
+    // Remove as colunas prioritárias da lista ordenada
+    sortedFields.removeWhere((col) => priorityColumns.contains(col));
+
+    // Combina as colunas (prioritárias primeiro, depois as demais em ordem alfabética)
+    final List<String> orderedFields = [
+      ...existingPriorityColumns,
+      ...sortedFields,
+    ];
+
+    return orderedFields.map((field) {
       final sampleValue = produtos.first[field];
       PlutoColumnType type;
 
@@ -344,11 +365,10 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
     final visibleRows = stateManager!.rows;
     if (visibleRows.isEmpty) return;
 
-    // Cria o Excel com apenas a aba "Produtos" (evitando Sheet1)
     final excel = Excel.createExcel();
-    final sheet = excel['Produtos']; // Isso já cria a aba se não existir
+    final sheet = excel['Produtos'];
 
-    final headers = columns.map((c) => c.field).toList();
+    final headers = stateManager!.columns.map((c) => c.field).toList();
     sheet.appendRow(headers);
 
     for (final row in visibleRows) {
@@ -361,47 +381,32 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
       if (kIsWeb) {
         final bytes = excel.encode();
         if (bytes != null) {
-          final blob = html.Blob(
-            [bytes],
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          );
+          final blob = html.Blob([bytes]);
           final url = html.Url.createObjectUrlFromBlob(blob);
           final anchor =
-              html.document.createElement('a') as html.AnchorElement
-                ..href = url
-                ..download = 'produtos_filtrados.xlsx'
-                ..style.display = 'none';
-
-          html.document.body?.children.add(anchor);
-          anchor.click();
-          html.document.body?.children.remove(anchor);
+              html.AnchorElement(href: url)
+                ..setAttribute("download", "produtos.xlsx")
+                ..click();
           html.Url.revokeObjectUrl(url);
-
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Exportação concluída!')),
-          );
         }
       } else {
         final dir = await getApplicationDocumentsDirectory();
-        final filePath = '${dir.path}/produtos_filtrados.xlsx';
-        final fileBytes = excel.encode();
-
-        if (fileBytes != null) {
-          final file = File(filePath);
-          await file.writeAsBytes(fileBytes);
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Arquivo salvo em: $filePath')),
-          );
-        }
+        final file =
+            File("${dir.path}/produtos.xlsx")
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(excel.encode()!);
       }
     } catch (e) {
-      debugPrint("Erro ao exportar: $e");
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Erro ao exportar arquivo')));
+      ).showSnackBar(SnackBar(content: Text('Erro ao exportar: $e')));
+    }
+  }
+
+  void atualizarGrid() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -409,34 +414,26 @@ class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
   Widget build(BuildContext context) {
     final produtos = ref.watch(produtosProvider);
 
-    columns = _buildDynamicColumns(produtos);
-    rows = _buildDynamicRows(produtos);
-
-    if (columns.isEmpty) {
-      return const Center(child: Text("Nenhum produto encontrado."));
+    if (produtos.isEmpty) {
+      return const Center(child: Text('Nenhum produto encontrado.'));
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: PlutoGrid(
-            columns: columns,
-            rows: rows,
-            onLoaded: (event) => stateManager = event.stateManager,
-            onChanged: (event) {
-              //debugPrint('Valor alterado: ${event.value}');
-              //debugPrint('Coluna: ${event.column.field}');
-              //debugPrint('Linha completa: ${event.row.cells}');
-            },
-            configuration: PlutoGridConfiguration(
-              localeText: PlutoGridLocaleText.brazilianPortuguese(),
-              columnSize: PlutoGridColumnSizeConfig(
-                autoSizeMode: PlutoAutoSizeMode.equal,
-              ),
-            ),
-          ),
+    final columns = _buildDynamicColumns(produtos);
+    final rows = _buildDynamicRows(produtos);
+
+    return PlutoGrid(
+      columns: columns,
+      rows: rows,
+      onLoaded: (PlutoGridOnLoadedEvent event) {
+        stateManager = event.stateManager;
+      },
+      onChanged: (PlutoGridOnChangedEvent event) {},
+      configuration: PlutoGridConfiguration(
+        localeText: PlutoGridLocaleText.brazilianPortuguese(),
+        columnSize: PlutoGridColumnSizeConfig(
+          autoSizeMode: PlutoAutoSizeMode.equal,
         ),
-      ],
+      ),
     );
   }
 }
