@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pluto_grid/pluto_grid.dart';
-import '../provider/theme_provider.dart' as my_theme;
+//import '../provider/theme_provider.dart' as my_theme;
 import '../provider/user_products.dart';
 import '../provider/user_provider.dart';
 import '../widgets/btn_novo_produto.dart';
-import '../widgets/home_grid.dart';
+//import '../widgets/home_grid.dart';
 import '../widgets/custom_appbar.dart';
 
 import 'dart:io';

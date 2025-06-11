@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:pluto_grid/pluto_grid.dart';
-import '../provider/theme_provider.dart' as my_theme;
+//import 'package:pluto_grid/pluto_grid.dart';
+//import '../provider/theme_provider.dart' as my_theme;
 import '../provider/user_products.dart';
 import '../provider/user_provider.dart';
 import '../utils/importdata.dart';
 import '../widgets/btn_novo_produto.dart';
 import '../widgets/custom_appbar.dart';
 
-import 'dart:io';
-import 'package:excel/excel.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_html/html.dart' as html; // Para Flutter Web
+//import 'dart:io';
+//import 'package:excel/excel.dart';
+//import 'package:flutter/foundation.dart' show kIsWeb;
+//import 'package:path_provider/path_provider.dart';
+//import 'package:universal_html/html.dart' as html;
+
+import '../widgets/produtos_grid.dart'; // Para Flutter Web
 
 const String nomePagina = "Produtos";
 
@@ -25,9 +27,7 @@ class ProdutosPage extends ConsumerStatefulWidget {
 }
 
 class _ProdutosPageState extends ConsumerState<ProdutosPage> {
-  final GlobalKey<_ProdutosPlutoGridState> _gridKey =
-      GlobalKey<_ProdutosPlutoGridState>();
-
+  final GlobalKey<ProdutosPlutoGridState> gridKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -105,10 +105,16 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                           ),
                           const Divider(height: 1),
                           InkWell(
-                            onTap: () {
-                              final produtos = ref.read(produtosProvider);
-                              _gridKey.currentState?.exportToExcel(produtos);
-                              _toggleMenu();
+                            onTap: () async {
+                              if (gridKey.currentState != null) {
+                                await gridKey.currentState!.exportToExcel();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  //cliquei no botão para exportar travou o vscode e nao exportou nada
+                                  const SnackBar(
+                                    content: Text('Exportação concluída!'),
+                                  ),
+                                );
+                              }
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(
@@ -233,12 +239,8 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () async {
-                            final userData = ref.read(userProvider);
-                            if (userData != null && userData.email != null) {
-                              await ref
-                                  .read(produtosProvider.notifier)
-                                  .buscarProdutos(userData.email!);
-                              _gridKey.currentState?.atualizarGrid();
+                            if (gridKey.currentState != null) {
+                              await gridKey.currentState!.recarregarProdutos();
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -275,7 +277,10 @@ class _ProdutosPageState extends ConsumerState<ProdutosPage> {
                 alignment: Alignment.topCenter,
                 child: SizedBox(
                   height: 400,
-                  child: ProdutosPlutoGrid(key: _gridKey),
+                  child: ProdutosPlutoGrid(
+                    key: gridKey,
+                    userEmail: userData.email!,
+                  ),
                 ),
               ),
             ),
@@ -290,150 +295,3 @@ final produtosProvider =
     StateNotifierProvider<ProdutosNotifier, List<Map<String, dynamic>>>(
       (ref) => ProdutosNotifier(),
     );
-
-class ProdutosPlutoGrid extends ConsumerStatefulWidget {
-  const ProdutosPlutoGrid({super.key});
-
-  @override
-  ConsumerState<ProdutosPlutoGrid> createState() => _ProdutosPlutoGridState();
-}
-
-class _ProdutosPlutoGridState extends ConsumerState<ProdutosPlutoGrid> {
-  List<PlutoColumn> columns = [];
-  List<PlutoRow> rows = [];
-  PlutoGridStateManager? stateManager;
-
-  List<PlutoColumn> _buildDynamicColumns(List<Map<String, dynamic>> produtos) {
-    if (produtos.isEmpty) return [];
-
-    // Obtém todos os campos únicos
-    final Set<String> fields = produtos.expand((p) => p.keys).toSet();
-
-    // Converte para lista e ordena alfabeticamente
-    List<String> sortedFields = fields.toList()..sort((a, b) => a.compareTo(b));
-
-    // Define a ordem prioritária para as colunas especiais
-    const List<String> priorityColumns = ['cod', 'nome'];
-
-    // Filtra as colunas prioritárias que existem nos dados
-    final List<String> existingPriorityColumns =
-        priorityColumns.where((col) => sortedFields.contains(col)).toList();
-
-    // Remove as colunas prioritárias da lista ordenada
-    sortedFields.removeWhere((col) => priorityColumns.contains(col));
-
-    // Combina as colunas (prioritárias primeiro, depois as demais em ordem alfabética)
-    final List<String> orderedFields = [
-      ...existingPriorityColumns,
-      ...sortedFields,
-    ];
-
-    return orderedFields.map((field) {
-      final sampleValue = produtos.first[field];
-      PlutoColumnType type;
-
-      if (sampleValue is num) {
-        type = PlutoColumnType.number();
-      } else if (sampleValue is bool) {
-        type = PlutoColumnType.select(['true', 'false']);
-      } else {
-        type = PlutoColumnType.text();
-      }
-
-      return PlutoColumn(
-        enableEditingMode: false,
-        title: field[0].toUpperCase() + field.substring(1),
-        field: field,
-        type: type,
-      );
-    }).toList();
-  }
-
-  List<PlutoRow> _buildDynamicRows(List<Map<String, dynamic>> produtos) {
-    return produtos.map((produto) {
-      final cells = <String, PlutoCell>{};
-      produto.forEach((key, value) {
-        cells[key] = PlutoCell(value: value);
-      });
-      return PlutoRow(cells: cells);
-    }).toList();
-  }
-
-  Future<void> exportToExcel(List<Map<String, dynamic>> produtos) async {
-    if (stateManager == null) return;
-
-    final visibleRows = stateManager!.rows;
-    if (visibleRows.isEmpty) return;
-
-    final excel = Excel.createExcel();
-    final sheet = excel['Produtos'];
-
-    final headers = stateManager!.columns.map((c) => c.field).toList();
-    sheet.appendRow(headers);
-
-    for (final row in visibleRows) {
-      final rowData =
-          headers.map((h) => row.cells[h]?.value?.toString() ?? '').toList();
-      sheet.appendRow(rowData);
-    }
-
-    try {
-      if (kIsWeb) {
-        final bytes = excel.encode();
-        if (bytes != null) {
-          final blob = html.Blob([bytes]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          final anchor =
-              html.AnchorElement(href: url)
-                ..setAttribute("download", "produtos.xlsx")
-                ..click();
-          html.Url.revokeObjectUrl(url);
-        }
-      } else {
-        final dir = await getApplicationDocumentsDirectory();
-        final file =
-            File("${dir.path}/produtos.xlsx")
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(excel.encode()!);
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao exportar: $e')));
-    }
-  }
-
-  void atualizarGrid() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final produtos = ref.watch(produtosProvider);
-
-    if (produtos.isEmpty) {
-      return const Center(child: Text('Nenhum produto encontrado.'));
-    }
-
-    final columns = _buildDynamicColumns(produtos);
-    final rows = _buildDynamicRows(produtos);
-
-    return PlutoGrid(
-      columns: columns,
-      rows: rows,
-      onLoaded: (PlutoGridOnLoadedEvent event) {
-        stateManager = event.stateManager;
-      },
-      onChanged: (PlutoGridOnChangedEvent event) {},
-      configuration: PlutoGridConfiguration(
-        localeText: PlutoGridLocaleText.brazilianPortuguese(),
-        columnSize: PlutoGridColumnSizeConfig(
-          autoSizeMode: PlutoAutoSizeMode.equal,
-        ),
-      ),
-    );
-  }
-}
